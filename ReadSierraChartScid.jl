@@ -4,6 +4,8 @@
 # m is a futures contract month code: H, M, U, or Z
 # yy is a 2 digit year
 
+#using StaticArrays
+
 # the following struct definitions are taken from the Sierra Chart scdatetime.h file
 # Times are in UTC
 
@@ -20,9 +22,17 @@ mutable struct s_IntradayFileHeader
 	Version::UInt16
 	Unused1::UInt16
 	Unused2::UInt32
-	Reserve::Vector{UInt8}
-
-    s_IntradayFileHeader() = new() # allow cretion of uninitialed object
+	Reserve1::UInt32
+    Reserve2::UInt32
+    Reserve3::UInt32
+    Reserve4::UInt32
+    Reserve5::UInt32
+    Reserve6::UInt32
+    Reserve7::UInt32
+    Reserve8::UInt32
+    Reserve9::UInt32
+    
+    s_IntradayFileHeader() = new()
 end
 
 function read_hdr(f::IOStream, hdr::s_IntradayFileHeader)
@@ -89,12 +99,15 @@ function main()
     datafile_outdir = "C:/Users/lel48/SierraChartData/" 
     futures_root = "ES" 
 
-    my_test = s_IntradayFileHeader()
-    my_test.Reserve[1] = 'a'
-    a = 7
+    my_test1 = s_IntradayFileHeader()
+    my_test1.Reserve1 = 2
+    aaa = sizeof(my_test1)
+    my_test2 = s_IntradayRecord()
+    bbb = sizeof(my_test2)
+    c = 1
 end
 
-function processScidFile(futures_root:Char, filename::String, datafile_outdir::String)
+function processScidFile(futures_root::Char, filename::String, datafile_outdir::String)
     # 3rd char of file name is futures code: H, M, U, or Z
     futures_code = uppercase(filename[3])
     if !(futures_code in ['H', 'M', 'U', 'Z'])
