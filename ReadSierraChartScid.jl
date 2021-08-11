@@ -89,7 +89,7 @@ function main()
     datafile_outdir = "C:/Users/lel48/SierraChartData/" 
     futures_root = "ES" 
 
-    my_test = s_IntradayFileHeader(0,0,0,0,0,0,zeros(UInt8,36))
+    my_test = s_IntradayFileHeader()
     my_test.Reserve[1] = 'a'
     a = 7
 end
