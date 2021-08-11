@@ -85,7 +85,7 @@ function write_rec(f::IOStream, rec::s_IntradayRecord)
 end
 
 function main()
-    datafileDir = "C:/SierraChart/Data/"
+    datafile_dir = "C:/SierraChart/Data/"
     datafile_outdir = "C:/Users/lel48/SierraChartData/" 
     futures_root = "ES" 
 
