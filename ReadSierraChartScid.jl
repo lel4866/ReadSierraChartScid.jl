@@ -20,7 +20,6 @@ mutable struct s_IntradayFileHeader
 	Version::UInt16
 	Unused1::UInt16
 	Unused2::UInt32
-    # need 36 bytes of reserve - got to be a better way!
     Reserve1::UInt32
     Reserve2::UInt32
     Reserve3::UInt32
@@ -30,25 +29,26 @@ mutable struct s_IntradayFileHeader
     Reserve7::UInt32
     Reserve8::UInt32
     Reserve9::UInt32
+    Reserve10::UInt32
+    Reserve11::UInt32
 end
 
-
 function read_hdr(f::IOStream, hdr::s_IntradayFileHeader)
-    read(f, hdr.FileTypeUniqueHeaderID)
-    read(f, hdr.HeaderSize)
-    read(f, hdr.RecordSize)
-    read(f, hdr.Version)
-    read(f, hdr.Unused1)
-    read(f, hdr.Unused2)
-    read(f, hdr.Reserve1)
-    read(f, hdr.Reserve2)
-    read(f, hdr.Reserve3)
-    read(f, hdr.Reserve4)
-    read(f, hdr.Reserve5)
-    read(f, hdr.Reserve6)
-    read(f, hdr.Reserve7)
-    read(f, hdr.Reserve8)
-    read(f, hdr.Reserve9)
+    hdr.FileTypeUniqueHeaderID = read(f, UInt32)
+    hdr.HeaderSize = read(f, UInt32)
+    hdr.RecordSize = read(f, UInt32)
+    hdr.Version = read(f, UInt16)
+    hdr.Reserve1 = read(f, UInt16)
+    hdr.Reserve2 = read(f, UInt32)
+    hdr.Reserve3 = read(f, UInt32)
+    hdr.Reserve4 = read(f, UInt32)
+    hdr.Reserve5 = read(f, UInt32)
+    hdr.Reserve6 = read(f, UInt32)
+    hdr.Reserve7 = read(f, UInt32)
+    hdr.Reserve8 = read(f, UInt32)
+    hdr.Reserve9 = read(f, UInt32)
+    hdr.Reserve10 = read(f, UInt32)
+    hdr.Reserve11 = read(f, UInt32)
 end
 
 function write_hdr(f::IOStream, hdr::s_IntradayFileHeader)
@@ -70,7 +70,8 @@ function write_hdr(f::IOStream, hdr::s_IntradayFileHeader)
 end
 
 mutable struct s_IntradayRecord
-    DateTime::SCDateTime
+    #DateTime::SCDateTime
+    DateTime::Int64
     
     Open::Float32
     High::Float32
@@ -82,18 +83,20 @@ mutable struct s_IntradayRecord
     BidVolume::UInt32
     AskVolume::UInt32
 
-    s_IntradayRecord() = new() # allow cretion of uninitialed object
+    #s_IntradayRecord() = new(SCDateTime(0)) # allow cretion of uninitialized object
+    s_IntradayRecord() = new()
 end
 function read_rec(f::IOStream, rec::s_IntradayRecord)
-    read(f, rec.SCDateTime.m_dt)
-    read(f, rec.Open)
-    read(f, rec.High)
-    read(f, rec.Low)
-    read(f, rec.Close)
-    read(f, rec.NumTrades)
-    read(f, rec.TotalVolume)
-    read(f, rec.BidVolume)
-    read(f, rec.AskVolume)
+    rec.DateTime = read(f, Int64)
+    #rec.DateTime.m_dt = read(f, Int64)
+    rec.Open = read(f, Float32)
+    rec.High = read(f, Float32)
+    rec.Low = read(f, Float32)
+    rec.Close = read(f, Float32)
+    rec.NumTrades = read(f, UInt32)
+    rec.TotalVolume = read(f, UInt32)
+    rec.BidVolume = read(f, UInt32)
+    rec.AskVolume = read(f, UInt32)
 end
 
 function write_rec(f::IOStream, rec::s_IntradayRecord)
@@ -113,14 +116,20 @@ function main()
     datafile_outdir = "C:/Users/lel48/SierraChartData/" 
     futures_root = "ES" 
 
-    my_test1 = s_IntradayFileHeader(1, 2, 3, 4, 5, 6, [7, 8, 9, 10, 11, 12, 13, 14])
+    my_test1 = s_IntradayFileHeader(1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
     abc = sizeof(my_test1)
-    my_test1.Reserve = ['a', 'b', 'c', 'd']
-    def = sizeof(my_test1)
+    my_test1.Reserve1 = 5
     my_test2 = s_IntradayRecord()
     bbb = sizeof(my_test2)
-    #my_test1.R10[1] = 'a'
-    return my_test1
+    my_test3 = s_IntradayRecord()
+    #return my_test1
+    
+
+    io = open("C:/SierraChart/Data/ESZ20.scid", "r")
+    read_hdr(io, my_test1)
+    read_rec(io, my_test2)
+    read_rec(io, my_test3)
+    xxx = 1 
 end
 
 function processScidFile(futures_root::Char, filename::String, datafile_outdir::String)
