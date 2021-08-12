@@ -4,8 +4,6 @@
 # m is a futures contract month code: H, M, U, or Z
 # yy is a 2 digit year
 
-#using StaticArrays
-
 # the following struct definitions are taken from the Sierra Chart scdatetime.h file
 # Times are in UTC
 
@@ -22,7 +20,8 @@ mutable struct s_IntradayFileHeader
 	Version::UInt16
 	Unused1::UInt16
 	Unused2::UInt32
-	Reserve1::UInt32
+    # need 36 bytes of reserve - got to be a better way!
+    Reserve1::UInt32
     Reserve2::UInt32
     Reserve3::UInt32
     Reserve4::UInt32
@@ -31,9 +30,8 @@ mutable struct s_IntradayFileHeader
     Reserve7::UInt32
     Reserve8::UInt32
     Reserve9::UInt32
-    
-    s_IntradayFileHeader() = new()
 end
+
 
 function read_hdr(f::IOStream, hdr::s_IntradayFileHeader)
     read(f, hdr.FileTypeUniqueHeaderID)
@@ -42,7 +40,15 @@ function read_hdr(f::IOStream, hdr::s_IntradayFileHeader)
     read(f, hdr.Version)
     read(f, hdr.Unused1)
     read(f, hdr.Unused2)
-    read(f, hdr.Reserve)
+    read(f, hdr.Reserve1)
+    read(f, hdr.Reserve2)
+    read(f, hdr.Reserve3)
+    read(f, hdr.Reserve4)
+    read(f, hdr.Reserve5)
+    read(f, hdr.Reserve6)
+    read(f, hdr.Reserve7)
+    read(f, hdr.Reserve8)
+    read(f, hdr.Reserve9)
 end
 
 function write_hdr(f::IOStream, hdr::s_IntradayFileHeader)
@@ -52,7 +58,15 @@ function write_hdr(f::IOStream, hdr::s_IntradayFileHeader)
     write(f, hdr.Version)
     write(f, hdr.Unused1)
     write(f, hdr.Unused2)
-    write(f, hdr.Reserve)
+    write(f, hdr.Reserve1)
+    write(f, hdr.Reserve2)
+    write(f, hdr.Reserve3)
+    write(f, hdr.Reserve4)
+    write(f, hdr.Reserve5)
+    write(f, hdr.Reserve6)
+    write(f, hdr.Reserve7)
+    write(f, hdr.Reserve8)
+    write(f, hdr.Reserve9)
 end
 
 mutable struct s_IntradayRecord
@@ -99,12 +113,14 @@ function main()
     datafile_outdir = "C:/Users/lel48/SierraChartData/" 
     futures_root = "ES" 
 
-    my_test1 = s_IntradayFileHeader()
-    my_test1.Reserve1 = 2
-    aaa = sizeof(my_test1)
+    my_test1 = s_IntradayFileHeader(1, 2, 3, 4, 5, 6, [7, 8, 9, 10, 11, 12, 13, 14])
+    abc = sizeof(my_test1)
+    my_test1.Reserve = ['a', 'b', 'c', 'd']
+    def = sizeof(my_test1)
     my_test2 = s_IntradayRecord()
     bbb = sizeof(my_test2)
-    c = 1
+    #my_test1.R10[1] = 'a'
+    return my_test1
 end
 
 function processScidFile(futures_root::Char, filename::String, datafile_outdir::String)
@@ -115,4 +131,4 @@ function processScidFile(futures_root::Char, filename::String, datafile_outdir::
     end
 end
 
-main()
+myt = main()
