@@ -29,8 +29,6 @@ mutable struct s_IntradayFileHeader
     Reserve7::UInt32
     Reserve8::UInt32
     Reserve9::UInt32
-    Reserve10::UInt32
-    Reserve11::UInt32
 end
 
 function read_hdr(f::IOStream, hdr::s_IntradayFileHeader)
@@ -38,7 +36,9 @@ function read_hdr(f::IOStream, hdr::s_IntradayFileHeader)
     hdr.HeaderSize = read(f, UInt32)
     hdr.RecordSize = read(f, UInt32)
     hdr.Version = read(f, UInt16)
-    hdr.Reserve1 = read(f, UInt16)
+    hdr.Unused1 = read(f, UInt16)
+    hdr.Unused2 = read(f, UInt32)
+    hdr.Reserve1 = read(f, UInt32)
     hdr.Reserve2 = read(f, UInt32)
     hdr.Reserve3 = read(f, UInt32)
     hdr.Reserve4 = read(f, UInt32)
@@ -47,8 +47,6 @@ function read_hdr(f::IOStream, hdr::s_IntradayFileHeader)
     hdr.Reserve7 = read(f, UInt32)
     hdr.Reserve8 = read(f, UInt32)
     hdr.Reserve9 = read(f, UInt32)
-    hdr.Reserve10 = read(f, UInt32)
-    hdr.Reserve11 = read(f, UInt32)
 end
 
 function write_hdr(f::IOStream, hdr::s_IntradayFileHeader)
@@ -116,7 +114,7 @@ function main()
     datafile_outdir = "C:/Users/lel48/SierraChartData/" 
     futures_root = "ES" 
 
-    my_test1 = s_IntradayFileHeader(1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+    my_test1 = s_IntradayFileHeader(1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 7, 8, 9)
     abc = sizeof(my_test1)
     my_test1.Reserve1 = 5
     my_test2 = s_IntradayRecord()
@@ -127,8 +125,14 @@ function main()
 
     io = open("C:/SierraChart/Data/ESZ20.scid", "r")
     read_hdr(io, my_test1)
-    read_rec(io, my_test2)
-    read_rec(io, my_test3)
+    count = 0
+    while !eof(io)
+        count = count+1
+        if count == 1000000
+            break
+        end
+        read_rec(io, my_test2)
+    end
     xxx = 1 
 end
 
